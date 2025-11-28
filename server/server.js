@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const compression = require("compression");
 const connectDB = require("./config/db");
 const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
@@ -19,22 +20,29 @@ connectDB();
 // ============================
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:5174", // YOUR FRONTEND
+  "http://localhost:5174",
   "http://localhost:3000",
   "https://umojafund.vercel.app"
 ];
 
 // ============================
-// 🚀 FIXED CORS — NO CALLBACK
+// 🚀 FIXED CORS — CORRECT CALLBACK
 // ============================
 app.use(cors({
-  origin: allowedOrigins,
   credentials: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
 }));
 
 // ============================
 // 🚀 MIDDLEWARES
 // ============================
+app.use(cookieParser());
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(compression());
@@ -44,7 +52,7 @@ app.use(express.json());
 // 🚀 RATE LIMIT (SAFE)
 // ============================
 const authLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
+  windowMs: 1 * 60 * 1000,
   max: 30,
   message: { success: false, message: "Too many requests, slow down." }
 });

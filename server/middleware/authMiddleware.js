@@ -21,7 +21,9 @@ const protect = async (req, res, next) => {
       const user = await User.findById(decoded.id).select('-password');
 
       if (!user) {
-        return res.status(401).json({ message: 'User not found, authorization denied' });
+        return res
+          .status(401)
+          .json({ message: 'User not found, authorization denied' });
       }
 
       // Attach user to request object
@@ -30,12 +32,16 @@ const protect = async (req, res, next) => {
       return next();
     } catch (err) {
       console.error('Token verification failed:', err.message);
-      return res.status(401).json({ message: 'Not authorized, invalid token' });
+      return res
+        .status(401)
+        .json({ message: 'Not authorized, invalid token' });
     }
   }
 
   // If no token found
-  return res.status(401).json({ message: 'Not authorized, no token provided' });
+  return res
+    .status(401)
+    .json({ message: 'Not authorized, no token provided' });
 };
 
 module.exports = { protect };

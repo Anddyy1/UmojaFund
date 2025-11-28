@@ -6,7 +6,7 @@ const generateToken = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
     process.env.JWT_SECRET,
-    { expiresIn: '30d' } // token valid for 30 days
+    { expiresIn: '30d' }
   );
 };
 
@@ -14,29 +14,38 @@ const generateToken = (user) => {
 // --- POST /api/auth/register ---
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
-  console.log('Register request body:', req.body); // <-- Debug log
+  console.log('Register request body:', req.body);
 
   try {
-    // Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       console.log('Registration failed: Email already exists:', email);
       return res.status(400).json({ message: 'Email already exists' });
     }
 
-    // Create new user
     const user = await User.create({ name, email, password });
     console.log('User created successfully:', user._id);
 
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user),
+    const token = generateToken(user);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1000
     });
+
+    res.status(201).json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      }
+    });
+
   } catch (err) {
-    console.error('Register error:', err); // <-- Detailed error log
+    console.error('Register error:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
@@ -45,7 +54,7 @@ const registerUser = async (req, res) => {
 // --- POST /api/auth/login ---
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  console.log('Login request body:', req.body); // <-- Debug log
+  console.log('Login request body:', req.body);
 
   try {
     const user = await User.findOne({ email });
@@ -60,13 +69,24 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user),
+    const token = generateToken(user);
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1000
     });
+
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      }
+    });
+
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -82,7 +102,9 @@ const getMe = async (req, res) => {
       console.log('GetMe failed: User not found', req.user.id);
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user);
+
+    res.json({ user });
+
   } catch (err) {
     console.error('GetMe error:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
