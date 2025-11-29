@@ -1,6 +1,9 @@
 import { NavLink } from "react-router-dom";
+import useDarkMode from "../hooks/useDarkMode";
 
 export default function Sidebar() {
+  const { theme, toggleTheme } = useDarkMode();
+  
   const linkClasses =
     "block px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-orange-200 transition";
 
@@ -40,6 +43,16 @@ export default function Sidebar() {
         </NavLink>
 
       </nav>
+
+      <button
+        onClick={toggleTheme}
+        className="w-full mt-6 bg-emerald-600 dark:bg-amber-600 
+                   text-white py-2 px-4 rounded-xl shadow-md
+                   hover:bg-emerald-700 dark:hover:bg-amber-700
+                   transition-all"
+      >
+        {theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}
+      </button>
     </aside>
   );
 }

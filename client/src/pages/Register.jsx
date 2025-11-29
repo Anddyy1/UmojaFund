@@ -17,6 +17,19 @@ function Register() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+
+  // Password strength
+  const getStrength = (password) => {
+    if (!password) return "";
+    if (password.length > 8 && /[A-Z]/.test(password) && /\d/.test(password))
+      return "strong";
+    if (password.length > 6) return "medium";
+    return "weak";
+  };
+
+  const strength = getStrength(form.password);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -50,16 +63,19 @@ function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-amber-50 p-4">
-      <div className="w-full max-w-2xl bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-emerald-100">
+      <div className="w-full max-w-2xl bg-white/90 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-emerald-100 transition-all">
+
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 animate-fade-in">
           <div className="flex justify-center items-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full flex items-center justify-center shadow-md">
               <span className="text-white font-bold text-xl">U</span>
             </div>
           </div>
           <h2 className="text-3xl font-bold text-emerald-900">Join Our Community</h2>
-          <p className="text-emerald-600 mt-2">Start your journey to make a difference today</p>
+          <p className="text-emerald-600 mt-2">
+            Start your journey to make a difference today
+          </p>
         </div>
 
         {error && (
@@ -68,95 +84,149 @@ function Register() {
           </p>
         )}
 
-        {/* Account Type Selection */}
+        {/* Account Type */}
         <div className="mb-6">
-          <label className="block text-emerald-700 font-medium mb-3">I want to join as a:</label>
+          <label className="block text-emerald-700 font-medium mb-3">
+            I want to join as a:
+          </label>
           <div className="grid grid-cols-2 gap-4">
+
+            {/* SUPPORTER */}
             <button
               type="button"
               onClick={() => setForm({...form, accountType: 'supporter'})}
-              className={`p-4 border-2 rounded-xl text-center transition-all ${
+              className={`p-4 border-2 rounded-xl text-center transition-all transform hover:-translate-y-1 ${
                 form.accountType === 'supporter' 
-                  ? 'border-emerald-500 bg-emerald-50 shadow-md' 
-                  : 'border-emerald-200 hover:border-emerald-300 hover:shadow-sm'
+                  ? 'border-emerald-500 bg-emerald-50 shadow-lg'
+                  : 'border-emerald-200 hover:border-emerald-300 hover:shadow-md'
               }`}
             >
               <div className="text-2xl mb-2">❤️</div>
               <div className="font-semibold text-emerald-800">Supporter</div>
-              <div className="text-sm text-emerald-600 mt-1">Back campaigns & make impact</div>
+              <div className="text-sm text-emerald-600 mt-1">
+                Back campaigns & make impact
+              </div>
             </button>
+
+            {/* CREATOR */}
             <button
               type="button"
               onClick={() => setForm({...form, accountType: 'creator'})}
-              className={`p-4 border-2 rounded-xl text-center transition-all ${
+              className={`p-4 border-2 rounded-xl text-center transition-all transform hover:-translate-y-1 ${
                 form.accountType === 'creator' 
-                  ? 'border-amber-500 bg-amber-50 shadow-md' 
-                  : 'border-amber-200 hover:border-amber-300 hover:shadow-sm'
+                  ? 'border-amber-500 bg-amber-50 shadow-lg'
+                  : 'border-amber-200 hover:border-amber-300 hover:shadow-md'
               }`}
             >
               <div className="text-2xl mb-2">🚀</div>
               <div className="font-semibold text-amber-800">Campaign Creator</div>
-              <div className="text-sm text-amber-600 mt-1">Start fundraising campaigns</div>
+              <div className="text-sm text-amber-600 mt-1">
+                Start fundraising campaigns
+              </div>
             </button>
+
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* FULL NAME */}
           <div>
-            <label className="block text-emerald-700 font-medium mb-2">Full Name</label>
+            <label className="block text-emerald-700 font-medium mb-2">
+              Full Name
+            </label>
             <input
               type="text"
               name="name"
               placeholder="Enter your full name"
-              className="w-full p-3 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition bg-emerald-50/50"
+              className="w-full p-3 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 bg-emerald-50/50 transition"
               value={form.name}
               onChange={handleChange}
               required
             />
           </div>
 
+          {/* EMAIL */}
           <div>
-            <label className="block text-emerald-700 font-medium mb-2">Email Address</label>
+            <label className="block text-emerald-700 font-medium mb-2">
+              Email Address
+            </label>
             <input
               type="email"
               name="email"
               placeholder="Enter your email address"
-              className="w-full p-3 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition bg-emerald-50/50"
+              className="w-full p-3 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 bg-emerald-50/50 transition"
               value={form.email}
               onChange={handleChange}
               required
             />
           </div>
 
+          {/* PASSWORD + CONFIRM */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-emerald-700 font-medium mb-2">Password</label>
+
+            {/* PASSWORD */}
+            <div className="relative">
+              <label className="block text-emerald-700 font-medium mb-2">
+                Password
+              </label>
               <input
-                type="password"
+                type={showPass ? "text" : "password"}
                 name="password"
                 placeholder="Create a password"
-                className="w-full p-3 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition bg-emerald-50/50"
+                className="w-full p-3 pr-12 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 bg-emerald-50/50 transition"
                 value={form.password}
                 onChange={handleChange}
                 required
               />
+              <span
+                onClick={() => setShowPass(!showPass)}
+                className="absolute right-3 top-11 cursor-pointer text-emerald-600 text-sm"
+              >
+                {showPass ? "Hide" : "Show"}
+              </span>
+
+              {/* Password strength */}
+              {form.password && (
+                <p
+                  className={`mt-1 text-xs ${
+                    strength === "strong"
+                      ? "text-emerald-600"
+                      : strength === "medium"
+                      ? "text-amber-600"
+                      : "text-red-500"
+                  }`}
+                >
+                  Strength: {strength}
+                </p>
+              )}
             </div>
 
-            <div>
-              <label className="block text-emerald-700 font-medium mb-2">Confirm Password</label>
+            {/* CONFIRM PASSWORD */}
+            <div className="relative">
+              <label className="block text-emerald-700 font-medium mb-2">
+                Confirm Password
+              </label>
               <input
-                type="password"
+                type={showConfirmPass ? "text" : "password"}
                 name="confirmPassword"
                 placeholder="Confirm your password"
-                className="w-full p-3 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition bg-emerald-50/50"
+                className="w-full p-3 pr-12 rounded-xl border border-emerald-200 focus:ring-2 focus:ring-emerald-500 bg-emerald-50/50 transition"
                 value={form.confirmPassword}
                 onChange={handleChange}
                 required
               />
+              <span
+                onClick={() => setShowConfirmPass(!showConfirmPass)}
+                className="absolute right-3 top-11 cursor-pointer text-amber-600 text-sm"
+              >
+                {showConfirmPass ? "Hide" : "Show"}
+              </span>
             </div>
+
           </div>
 
-          {/* Terms Agreement */}
+          {/* TERMS */}
           <div className="flex items-start space-x-3 mt-4 p-3 bg-emerald-50 rounded-xl">
             <input
               type="checkbox"
@@ -164,29 +234,55 @@ function Register() {
               className="mt-1 rounded focus:ring-emerald-500 text-emerald-500"
             />
             <label className="text-sm text-emerald-700">
-              I agree to the <Link to="/terms" className="text-amber-600 hover:underline font-medium">Terms of Service</Link> and <Link to="/privacy" className="text-amber-600 hover:underline font-medium">Privacy Policy</Link>. I understand that UmojaFund is a platform for community fundraising.
+              I agree to the{" "}
+              <Link
+                to="/terms"
+                className="text-amber-600 hover:underline font-medium"
+              >
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link
+                to="/privacy"
+                className="text-amber-600 hover:underline font-medium"
+              >
+                Privacy Policy
+              </Link>.
             </label>
           </div>
 
+          {/* SUBMIT */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-emerald-500 to-amber-500 hover:from-emerald-600 hover:to-amber-600 text-white py-3 rounded-xl font-semibold transition-all transform hover:-translate-y-0.5 disabled:opacity-50 shadow-md mt-6"
+            className="w-full bg-gradient-to-r from-emerald-500 to-amber-500 hover:from-emerald-600 hover:to-amber-600 text-white py-3 rounded-xl font-semibold transition-all transform hover:-translate-y-1 disabled:opacity-50 shadow-md mt-6"
           >
-            {loading ? "Creating your account..." : `Join as ${form.accountType === 'creator' ? 'Campaign Creator' : 'Supporter'}`}
+            {loading
+              ? "Creating your account..."
+              : `Join as ${
+                  form.accountType === "creator"
+                    ? "Campaign Creator"
+                    : "Supporter"
+                }`}
           </button>
         </form>
 
+        {/* Already Have Account */}
         <div className="text-center text-emerald-700 mt-6">
-          <p>Already have an account?{" "}
-          <Link to="/login" className="text-amber-600 font-semibold hover:underline">
-            Sign in here
-          </Link></p>
+          <p>
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-amber-600 font-semibold hover:underline"
+            >
+              Sign in here
+            </Link>
+          </p>
         </div>
 
-        {/* Trust Indicators */}
-        <div className="mt-8 text-center">
-          <div className="flex justify-center space-x-6 text-xs text-emerald-500 mb-4">
+        {/* TRUST SECTION */}
+        <div className="mt-8 text-center animate-fade-in">
+          <div className="flex justify-center flex-wrap gap-4 text-xs text-emerald-500 mb-4">
             <span>✅ 48K+ Campaigns</span>
             <span>✅ $2.1M+ Raised</span>
             <span>✅ 82% Success Rate</span>
@@ -195,6 +291,7 @@ function Register() {
             🔒 Your information is secure. We never share your data with third parties.
           </p>
         </div>
+
       </div>
     </div>
   );

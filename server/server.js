@@ -43,10 +43,19 @@ app.use(cors({
 // 🚀 MIDDLEWARES
 // ============================
 app.use(cookieParser());
-app.use(helmet());
+
+// Prevent helmet from blocking frontend requests
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
+
 app.use(morgan("dev"));
 app.use(compression());
-app.use(express.json());
+
+// Increase JSON limit slightly (safe)
+app.use(express.json({ limit: "2mb" }));
 
 // ============================
 // 🚀 RATE LIMIT (SAFE)
@@ -84,6 +93,11 @@ app.use((req, res) => {
 // ============================
 app.use((err, req, res, next) => {
   console.error("🔥 SERVER ERROR:", err.message);
+
+  // Prevent CORS breaking on error
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+
   res.status(500).json({
     success: false,
     message: "Server error",
